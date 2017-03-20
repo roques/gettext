@@ -308,7 +308,7 @@ defmodule Gettext.POTest do
 
     assert IO.iodata_to_binary(PO.dump(po)) == ~S"""
     # other comment
-    #, bar baz foo
+    #, bar, baz, foo
     msgid "foo"
     msgstr "bar"
     """

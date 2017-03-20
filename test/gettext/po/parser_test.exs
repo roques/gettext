@@ -178,7 +178,7 @@ defmodule Gettext.PO.ParserTest do
 
   test "flags are extracted in to the :flags field of a translation" do
     parsed = Parser.parse([
-      {:comment, 1, "#, flag other-flag"},
+      {:comment, 1, "#, flag, other-flag"},
       {:comment, 2, "# comment"},
       {:comment, 3, "#, other-flag other-other-flag"},
       {:msgid, 4}, {:str, 4, "foo"},

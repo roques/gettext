@@ -282,8 +282,8 @@ defmodule Gettext.PO do
       flags =
         flags
         |> Enum.sort
-        |> Enum.map(&[?\s, &1])
-      ["#,", flags, ?\n]
+        |> Enum.map(&[?,, ?\s, &1])
+      ["#", flags, ?\n]	# the , of #, is dumped with the first flag
     end
   end
 
