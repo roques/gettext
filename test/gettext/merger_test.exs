@@ -91,6 +91,41 @@ defmodule Gettext.MergerTest do
     assert t.msgstr == ["foo"]
   end
 
+  test "merge/2: exact matches do not prevent fuzzy matches" do
+    old_po = %PO{translations: [%Translation{msgid: "hello world!", msgstr: ["foo"]}]}
+    new_pot = %PO{translations: [%Translation{msgid: "hello world!"},
+                                 %Translation{msgid: "hello worlds!"}]}
+
+    # "hello world!" will match exactly.
+    # "hello worlds!" should still get a fuzzy match.
+    assert %PO{translations: [t, t2]} = Merger.merge(old_po, new_pot, @opts)
+    refute MapSet.member?(t.flags, "fuzzy")
+    assert t.msgid == "hello world!"
+    assert t.msgstr == ["foo"]
+    assert MapSet.member?(t2.flags, "fuzzy")
+    assert t2.msgid == "hello worlds!"
+    assert t2.msgstr == ["foo"]
+  end
+
+  test "merge/2: filling in a fuzzy translation preserves extracted comments and references" do
+    old_po = %PO{translations: [%Translation{msgid: "hello world!",
+					     msgstr: ["foo"],
+					     comments: ["# old comment"],
+					     extracted_comments: ["#. old extracted comment"],
+					     references: [{"old_file.txt", 1}]}]}
+    new_pot = %PO{translations: [%Translation{msgid: "hello worlds!",
+					      extracted_comments: ["#. new extracted comment"],
+					     references: [{"new_file.txt", 2}]}]}
+
+    assert %PO{translations: [t]} = Merger.merge(old_po, new_pot, @opts)
+    assert MapSet.member?(t.flags, "fuzzy")
+    assert t.msgid == "hello worlds!"
+    assert t.msgstr == ["foo"]
+    assert t.comments == ["# old comment"]
+    assert t.extracted_comments == ["#. new extracted comment"]
+    assert t.references == [{"new_file.txt", 2}]
+  end
+
   test "new_po_file/2" do
     pot_path = Path.join(@pot_path, "new_po_file.pot")
     new_po_path = Path.join(@pot_path, "it/LC_MESSAGES/new_po_file.po")

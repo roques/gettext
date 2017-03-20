@@ -54,7 +54,8 @@ defmodule Gettext.Fuzzy do
   """
   @spec merge(PO.translation, PO.translation) :: PO.translation
   def merge(new, existing) do
-    new |> do_merge_fuzzy(existing) |> PO.Translations.mark_as_fuzzy
+    %{ new | comments: existing.comments }
+    |> do_merge_fuzzy(existing) |> PO.Translations.mark_as_fuzzy
   end
 
   defp do_merge_fuzzy(%Translation{} = new, %Translation{} = existing),
